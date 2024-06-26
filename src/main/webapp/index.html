@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>NG JS</title>
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/simplePagination.css">
+   <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  
+
+ 
+</head>
+
+<body style="background-image: url('film.jpg');">
+<div class="container">
+    <h1 class="title text-center custom-font">Films</h1>
+    
+    <!-- Search form -->
+    <div class="row justify-content-center">
+        <div class="col-md-14 text-center">
+            <div class="form-inline search-form">
+                <!-- Custom Select Dropdown -->
+                <div class="form-group">
+                    <select class="form-control custom-select" id="searchCategory">
+                        <option selected>Choose Category...</option>
+                        <option value="title">Movie Title</option>
+                        <option value="year">Release Year</option>
+                        <option value="director">Director Name</option>
+                        <option value="stars">Leading Stars</option>
+                    </select>
+                </div>
+                <!-- Animated Search Input -->
+                <div class="form-group has-feedback">
+                    <label for="searchField" class="sr-only">Search</label>
+                    <input type="text" id="searchField" class="form-control animated-input" placeholder="Type here...">
+                </div>
+                <!-- Vibrant Search Button -->
+                <button type="button" class="btn btn-primary btn-yellow search-btn">
+    <i class="fa fa-search"></i> Go!
+</button>
+
+            </div>
+        </div>
+    </div>
+    
+ 
+
+    
+        <div class="container">
+         
+
+            
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              
+                <ul class="nav navbar-nav">
+                   <li>
+ <a href="#" onclick="openFilmModal()" data-toggle="modal" data-target="#flipFlop" class="icon-link">
+    <img src="yy.png" alt="Add Films">
+    <span class="icon-text">ADD FILM</span>
+</a>
+
+</li>
+ </ul>
+                <select onchange="getFilms()" style="display: inline !important; width: 200px; margin: 10px; float: right;" class="form-control accept-format">
+                    <option value="application/json">Json</option>
+                    <option value="application/xml">Xml</option>
+                    <option value="text/html">Text</option>
+                </select>
+            </div>
+        </div>
+  
+
+
+    <table class="table table-bordered table-striped mt-5" id="filmTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Year</th>
+                <th>Director</th>
+                <th>Stars</th>
+                <th>Review ⭐️⭐️⭐️⭐️⭐️</th>
+
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody class="film-table-body">
+            
+        </tbody>
+    </table>
+
+<div class="container">
+    <!-- Pagination1 -->
+    <div class="col-md-6 pagination-info">
+        <p class="text-right">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></p>
+    </div>
+
+    <!-- Pagination2 -->
+    <div id="pagination" class="text-center"></div>
+</div>
+
+
+
+<div class="modal fade" id="flipFlop" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+  
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>×</span>
+                </button>
+                <h4 class="modal-title">Film</h4>
+            </div>
+            
+            
+            
+            
+       
+            <div class="modal-body">
+                <form class="film-form mt-5" id="film-form" method="POST">
+              
+                    <input type="hidden" name="id"/>
+                    <input type="text" class="form-control mb-3" name="title" placeholder="Title" required/>
+                    <input type="number" class="form-control mb-3" name="year" placeholder="Year" required/>
+                    <input type="text" class="form-control mb-3" name="director" placeholder="Director" required/>
+                    <input type="text" class="form-control mb-3" name="stars" placeholder="Stars" required/>
+                    <textarea class="form-control mb-3" name="review" placeholder="Review" rows="5" required></textarea>
+                </form>
+            </div>
+           
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="saveFilm(true)">Create</button>
+                <button type="button" class="btn btn-primary" onclick="saveFilm(false)">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+   <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js'></script>
+   <script src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js'></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/simplePagination.js/1.6/jquery.simplePagination.js"></script>
+   <script>
+	 //---------WWWWWWWWWWWWWWWWWWWWW----------------//  
+
+async function getFilms() {
+    try {
+        const accept = $(".accept-format").val();
+        const searchQuery = $("input[name=search]").val();
+        const response = await fetch(`FilmCity${$.trim(searchQuery) !== "" ? "?query=" + searchQuery : ""}`, {
+            headers: {
+                "Accept": accept
+            }
+        });
+
+        if (!response.ok) {
+            const errorMessage = await getErrorMessage(response, accept);
+            alert(errorMessage);
+            return;
+        }
+
+        const filmsData = await getFilmsData(response, accept);
+        loadFilms(filmsData);
+    } catch (err) {
+        alert(err.message);
+    }
+}
+
+async function getErrorMessage(response, accept) {
+    switch (accept.toLowerCase()) {
+        case "application/json":
+            return (await response.json()).message;
+        case "application/xml":
+            return xmlToJson(new DOMParser().parseFromString(await response.text(), "text/xml")).response.message;
+        case "text/html":
+            return await response.text();
+        default:
+            return "Error occurred while fetching films.";
+    }
+}
+
+async function getFilmsData(response, accept) {
+    switch (accept.toLowerCase()) {
+        case "application/json":
+            return (await response.json()).films;
+        case "application/xml":
+            const xmlDom = new DOMParser().parseFromString(await response.text(), "application/xml");
+            const data = xmlToJson(xmlDom);
+            return Array.isArray(data.films.film) ? data.films.film : [data.films.film];
+        case "text/html":
+            const text = await response.text();
+            return text.split("\r\n").filter(line => line.trim() !== "").map(convertTextToJson);
+        default:
+            return [];
+    }
+}
+
+
+	//-----------WWWWWWWWWWWW-------------------------//
+async function saveFilm(create = false) {
+    try {
+        const form = document.getElementById("film-form");
+        if (!form.reportValidity()) return;
+
+        const accept = $(".accept-format").val();
+        const filmData = extractFormData();
+        const requestOptions = buildRequestOptions(accept, create, filmData);
+        const response = await fetch("FilmCity", requestOptions);
+        handleResponse(response, accept);
+
+        if (response.ok) {
+            closeModal();
+            getFilms();
+        }
+    } catch (error) {
+        alert("An error occurred: " + error.message);
+    }
+}
+
+function extractFormData() {
+    return {
+        title: $(".film-form input[name=title]").val(),
+        year: $(".film-form input[name=year]").val(),
+        director: $(".film-form input[name=director]").val(),
+        stars: $(".film-form input[name=stars]").val(),
+        review: $(".film-form textarea[name=review]").val()
+    };
+}
+
+function buildRequestOptions(accept, create, filmData) {
+    let body;
+    switch (accept.toLowerCase()) {
+        case "application/json":
+            body = JSON.stringify(create ? filmData : { id: $(".film-form input[name=id]").val(), ...filmData });
+            break;
+        case "application/xml":
+            body = toXml({ film: filmData });
+            break;
+        case "text/html":
+            body = convertFilmToText(filmData);
+            break;
+        default:
+            throw new Error("Unsupported content type: " + accept);
+    }
+
+    return {
+        headers: {
+            "Accept": accept,
+            "Content-Type": accept
+        },
+        method: create ? "POST" : "PUT",
+        body: body
+    };
+}
+
+function handleResponse(response, accept) {
+    if (response.ok) {
+        alert("Film saved successfully!");
+    } else {
+        alert("Failed to save film. Status: " + response.status);
+    }
+}
+
+function closeModal() {
+    $('.modal-close').trigger('click');
+}
+
+	//-----------WWWWWWWWWWW...-----------------------//
+	
+	let currentPage = 1;
+const itemsPerPage = 10;
+async function deleteFilm(id) {
+    try {
+        const accept = $(".accept-format").val();
+        const response = await fetch(`FilmCity?id=${id}`, {
+            headers: { "Accept": accept },
+            method: "DELETE"
+        });
+        handleDeleteResponse(response, accept);
+    } catch (error) {
+        alert("An error occurred: " + error.message);
+    }
+}
+
+function handleDeleteResponse(response, accept) {
+    if (response.ok) {
+        alert("Film deleted successfully!");
+        getFilms();
+    } else {
+        switch (accept.toLowerCase()) {
+            case "application/json":
+                alert("Failed to delete film. " + response.statusText);
+                break;
+            case "application/xml":
+                alert(xmlToJson(new DOMParser().parseFromString(response, "text/xml")).response.message);
+                break;
+            case "text/html":
+                alert(response);
+                break;
+            default:
+                alert("Failed to delete film. Status: " + response.status);
+        }
+    }
+}
+
+	
+	
+	//---------CHECK ------------------//
+	function loadFilms(f) {
+    films = f;
+    const totalPages = Math.ceil(films.length / itemsPerPage);
+       $('#currentPage').text(currentPage);
+       $('#totalPages').text(totalPages);
+    let html = "";
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, films.length);
+    for (let i = startIndex; i < endIndex; i++) {
+        html += `
+            <tr>
+                <td>${f[i].id}</td>
+                <td>${f[i].title}</td>
+                <td>${f[i].year}</td>
+                <td>${f[i].director}</td>
+                <td>${f[i].stars}</td>
+                <td>${f[i].review}</td>
+                <td><a href="#" class="btn btn-info" data-toggle="modal" data-target="#flipFlop" onclick='openFilmModal(${JSON.stringify(f[i])})'><i class="fa-sharp fa-solid fa-pen-to-square"></i></a></td>
+                <td><a href="#" class="btn btn-warning" onclick="deleteFilm(${f[i].id})"><i class="fas fa-trash-alt fa-lg fa-fw animated swing"></i></a></td>
+            </tr>
+        `;
+    }
+    $('.film-table-body').html(html);
+//--------------WWWW-----------------------//
+   
+    function handlePageClick(pageNumber) {
+        currentPage = pageNumber;
+        loadFilms(films);
+    }
+
+    // pagination
+    $('#pagination').pagination({
+        items: films.length,
+        itemsOnPage: itemsPerPage,
+        currentPage: currentPage,
+        cssStyle: 'light-theme',
+        onPageClick: handlePageClick
+    });
+
+    
+    
+}
+	
+//------------WWWWWWW----------------///	
+function openFilmModal(film = null) {
+    const form = $(".film-form");
+    const idInput = form.find("input[name=id]");
+    const titleInput = form.find("input[name=title]");
+    const yearInput = form.find("input[name=year]");
+    const directorInput = form.find("input[name=director]");
+    const starsInput = form.find("input[name=stars]");
+    const reviewTextarea = form.find("textarea[name=review]");
+
+    if (!film) {
+        // Create
+        idInput.hide();
+        $(".create-film-btn").show();
+        $(".update-film-btn").hide();
+        idInput.val("");
+    } else {
+        // to edit an existing film
+        idInput.show();
+        $(".create-film-btn").hide();
+        $(".update-film-btn").show();
+        idInput.val(film.id || "");
+    }
+
+    // allows us to set form fields based on film data
+    titleInput.val(film ? film.title : "");
+    yearInput.val(film ? film.year : "");
+    directorInput.val(film ? film.director : "");
+    starsInput.val(film ? film.stars : "");
+    reviewTextarea.val(film ? film.review : "");
+}
+
+
+//---------WWWW------//
+function toXml(obj) {
+    let xml = '';
+    for (let prop in obj) {
+        if (!obj.hasOwnProperty(prop)) continue;
+
+        if (obj[prop] instanceof Array) {
+            for (let arrayItem of obj[prop]) {
+                xml += '\n<' + prop + '>\n';
+                xml += toXml(arrayItem);
+                xml += '</' + prop + '>';
+            }
+        } else if (typeof obj[prop] === 'object') {
+            xml += '<' + prop + '>';
+            xml += toXml(obj[prop]);
+            xml += '</' + prop + '>';
+        } else {
+            xml += '<' + prop + '>' + obj[prop] + '</' + prop + '>';
+        }
+    }
+    return xml;
+}
+
+	//--------WWW-------------//
+	function xmlToJson(srcDOM) {
+    const children = Array.from(srcDOM.children);
+
+    if (!children.length) return srcDOM.innerHTML;
+
+    const jsonResult = {};
+    children.forEach(child => {
+        const childIsArray = children.filter(eachChild => eachChild.nodeName === child.nodeName).length > 1;
+
+        if (childIsArray) {
+            jsonResult[child.nodeName] = jsonResult[child.nodeName] || [];
+            jsonResult[child.nodeName].push(xmlToJson(child));
+        } else {
+            jsonResult[child.nodeName] = xmlToJson(child);
+        }
+    });
+
+    return jsonResult;
+}
+
+	//-----------WWWW-------------//
+	function convertFilmToText(film) {
+    return `<ID>${film.id}<TITLE>${film.title}<YEAR>${film.year}<DIRECTOR>${film.director}<STARS>${film.stars}<REVIEW>${film.review}`;
+}
+
+	//-------------WWWW----------------//
+    function convertTextToJson(data) {
+    const parts = data.split("<REVIEW>");
+    const review = parts[1];
+    const stars = parts[0].split("<STARS>")[1];
+    const director = parts[0].split("<DIRECTOR>")[1];
+    const year = parts[0].split("<YEAR>")[1];
+    const title = parts[0].split("<TITLE>")[1];
+    const id = parts[0].split("<ID>")[1];
+    
+    return {
+        id: parseInt(id),
+        title: title,
+        year: parseInt(year),
+        director: director,
+        stars: stars,
+        review: review
+    };
+}
+
+$(document).ready(function() {
+    getFilms();
+});
+
+    
+//--------------------------------------//
+    function handleSearchOption() {
+    	  const searchOption = document.getElementById("searchCategory").value;
+    	  const searchField = document.getElementById("searchField");
+
+    	  switch (searchOption) {
+    	    case "title":
+    	      searchField.placeholder = "Enter Title";
+    	      break;
+    	    case "year":
+    	      searchField.placeholder = "Enter Year";
+    	      break;
+    	    case "director":
+    	      searchField.placeholder = "Enter Director";
+    	      break;
+    	    case "stars":
+    	      searchField.placeholder = "Enter Stars";
+    	      break;
+    	    default:
+    	      searchField.placeholder = "Type here...";
+    	  }
+    	}
+   //-----------------------------//
+    	function performSearch() {
+    	  const searchValue = document.getElementById("searchField").value.toLowerCase();
+    	  const searchOption = document.getElementById("searchCategory").value;
+
+    	  const filteredFilms = films.filter(film => {
+    	    const fieldValue = film[searchOption] ? film[searchOption].toString().toLowerCase() : '';
+    	    return fieldValue.includes(searchValue);
+    	  });
+
+   
+    	}
+
+    	document.querySelector(".search-btn").addEventListener("click", performSearch);
+
+  
+
+   </script>
+</body>
+</html>

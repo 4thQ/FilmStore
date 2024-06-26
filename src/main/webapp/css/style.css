@@ -1,0 +1,142 @@
+body {
+    background-color: #FED9C2;
+    font-family: Georgia, serif;
+}
+
+.table {
+    background-color: #FFF; 
+}
+
+.table th, .table td {
+    border-color: #DDD; 
+}
+
+.table th {
+    background-color: #333; 
+    color: #FFF;
+}
+
+
+.modal-header {
+    background-color: #333; 
+    color: #FFF; 
+
+.modal-header .close {
+    color: #FFF; 
+}
+
+.modal-footer {
+    background-color: #F2F2F2; 
+    border-color: #DDD; 
+}
+
+.title {
+    display: block; 
+    text-align: center;
+    font-family: 'Parisienne', cursive;
+    font-size: 3em;
+    color: #FFD700; 
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); 
+    margin-top: 50px;
+}
+.glow {
+  text-align: center;
+  font-size: 3em;
+  color: yellow;
+  text-shadow: 0 0 10px yellow;
+  font-family: 'Parisienne', cursive;
+}
+
+
+
+body {
+    background-image: url('film.jpg');
+    background-size: cover; 
+    background-repeat: no-repeat; 
+    background-position: center;
+}
+
+.add-icon img {
+    width: 80px; 
+    height: 80px; 
+}
+.icon-text {
+    font-family: "Your Bright Font", sans-serif; 
+    color: #FFD700; 
+    font-size: 18px; 
+    font-weight: bold; 
+}
+.btn-yellow {
+    background-color: #FFD700; 
+    border-color: #FFD700; 
+}
+
+.btn-yellow:hover,
+.btn-yellow:focus {
+    background-color: #FFD700; 
+    border-color: #FFD700; 
+}
+
+
+.add-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%; 
+}
+
+.pagination-info {
+    padding-right: 5px; 
+    margin-left: -250px; 
+}
+#pagination {
+     margin-left: 50px;
+    text-align: left;
+}
+
+
+.modal-header {
+    background-color: #4e555b; 
+    color: white; 
+    border-bottom: 2px solid #e4e5e6; 
+    
+}
+
+.modal-title {
+    font-family: 'Parisienne', cursive; 
+    font-size: 2em; 
+}
+
+.close {
+    color: white; 
+}
+
+.modal-content {
+    background-color: #f8f9fa; 
+}
+
+}
+.icon-link {
+    text-align: center;
+    display: inline-block;
+}
+
+.icon-text {
+    font-family: "Your Bright Font", sans-serif; 
+    color: #FFD700; 
+    font-size: 18px; 
+    font-weight: bold; 
+}
+.icon-link img {
+    width: 80px; 
+    height: 80px; 
+}
+.custom-font {
+    font-family: 'Parisienne', cursive; 
+    font-size: 300px; 
+    color: #FFD700; 
+     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
+}
+
+
