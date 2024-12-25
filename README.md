@@ -16,3 +16,5 @@ Technologies Used:
 -  Database: MySQL (cloud-hosted)
 -  Cloud Hosting: Multi-cloud deployment using AWS and Google Cloud
 -  Data Formats: JSON, XML, Text
+
+## ![image](https://github.com/user-attachments/assets/6634de44-df81-4e26-b2a6-014b1ab13f26)
